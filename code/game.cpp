@@ -5,6 +5,7 @@
 #include "Lose.h"
 #include "Win.h"
 #include "NegativeBonus.h"
+#include "PositiveBonus.h"
 #include <iostream>
 /* Test Framework realization */
 
@@ -272,6 +273,7 @@ public:
 	}
 
 	virtual bool Tick() {
+		bool positiveOrNegative = true;
 		balls.push_back(ball);
 		if (Ball::ballCounter == 0) {
 			lose.Update();
@@ -280,20 +282,42 @@ public:
 			win.Update();
 		}
 		else {
-			for (int i = 0; i < 1; i++) {
-				if (Map::counter % 10 == 0 && Map::counter!=0 && negBonus.onStage == false) {
-					negBonus.SetPosition(map.vectorOfFreePositions);
-					negBonus.onStage = true;
+			for (int i = 0; i < Ball::ballCounter; i++) {
+				if (positiveOrNegative == false) {
+					if (Map::counter % 10 == 0 && Map::counter != 0 && negBonus.onStage == false) {
+						negBonus.SetPosition(map.vectorOfFreePositions);
+						negBonus.onStage = true;
+					}
+					if (negBonus.onStage == true) {
+						negBonus.Update();
+						negBonus.CatchByPlatform(platform);
+					}
+					if (negBonus.isCatched == true) {
+						balls[i].SetPosition(negBonus.Effect(map.vectorOfFreePositions));
+						negBonus.isCatched = false;
+					}
 				}
-				if (negBonus.onStage == true) {
-					negBonus.Update();
-					negBonus.CatchByPlatform(platform);
+				else {
+					if (Map::counter % 10 == 0 && Map::counter != 0 && posBonus.onStage == false) {
+						posBonus.SetPosition(map.vectorOfFreePositions);
+						posBonus.onStage = true;
+					}
+					if (posBonus.onStage == true) {
+						posBonus.Update();
+						posBonus.CatchByPlatform(platform);
+					}
+					if (posBonus.isCatched == true) {
+						Ball::ballCounter += 2;
+						balls.push_back(ball1);
+						balls.push_back(ball2);
+						balls[Ball::ballCounter - 1].SetVelocity(4, -4);
+						balls[Ball::ballCounter-2].SetVelocity(-4, -4);
+						balls[Ball::ballCounter - 1].setIdle(false);
+						balls[Ball::ballCounter - 2].setIdle(false);
+						posBonus.isCatched = false;
+					}
 				}
-				if (negBonus.isCatched == true) {
-					balls[i].SetPosition(negBonus.Effect(map.vectorOfFreePositions));
-					negBonus.isCatched = false;
-				}
-				std::cout << Map::counter << std::endl;
+				std::cout << Ball::ballCounter << std::endl;
 				map.CreateMap();
 				platform.Update();
 				Point previousPosition = balls[i].GetPosition();
@@ -315,10 +339,10 @@ public:
 	virtual void onMouseMove(int x, int y, int xrelative, int yrelative) {
 			if (balls[0].getIdle()) {
 				if (x >= 400) {
-					balls[0].SetVelocity(3, -3);
+					balls[0].SetVelocity(4, -4);
 				}
 				else {
-					balls[0].SetVelocity(-3, -3);
+					balls[0].SetVelocity(-4, -4);
 				}
 				balls[0].setIdle(false);
 			}
@@ -344,11 +368,14 @@ public:
 private:
 	Platform platform = Platform(350, 550, 70, 100, 20);
 	Ball ball = Ball(360, 530, 20, 20);
+	Ball ball1 = Ball(360, 530, 20, 20);
+	Ball ball2 = Ball(360, 530, 20, 20);
 	std::vector<Ball> balls;
 	Map map = Map();
 	Lose lose = Lose(0, 0, 800, 600);
 	Win win = Win(0, 0, 800, 600);
 	NegativeBonus negBonus = NegativeBonus(20, 20);
+	PositiveBonus posBonus = PositiveBonus(20, 20);
 };
 
 
