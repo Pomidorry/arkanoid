@@ -20,5 +20,5 @@ int Object::GetWidth() const {
 	return o_width;
 }
 int Object::GetHeight() const {
-	return o_width;
+	return o_height;
 }

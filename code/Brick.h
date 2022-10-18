@@ -8,8 +8,7 @@ public:
 	// you depend on folder location
 	Brick(int x, int y, int width, int height);
 	void Update();
-	Colider* myColider = new Colider(o_width, o_height, this);
-	bool isBrick = true;
+	bool onStage = true;
 private:
 
 };

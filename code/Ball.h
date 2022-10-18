@@ -13,7 +13,9 @@ public:
 	void ChangeDirection(int dx, int dy);
 	void SetPosition(Point p);
 	void Move();
-
+	bool isBrick = true;
+	void Death();
+	inline static int ballCounter = 1;
 private:
 	double xVelocity = 0;
 	double yVelocity = 0;

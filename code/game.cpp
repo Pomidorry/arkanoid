@@ -1,7 +1,11 @@
 #include "Framework.h"
 #include "Ball.h"
 #include "Platform.h"
-#include "Brick.h"
+#include "Map.h"
+#include "Lose.h"
+#include "Win.h"
+#include "NegativeBonus.h"
+#include <iostream>
 /* Test Framework realization */
 
 //struct Point {
@@ -256,7 +260,7 @@ public:
 	}
 
 	virtual bool Init() {
-
+		
 		return true;
 	}
 
@@ -268,35 +272,62 @@ public:
 	}
 
 	virtual bool Tick() {
-		platform.Update();
-		Point prev = ball.GetPosition();
-		static Point previousPosition = ball.GetPosition();
-		ball.Update();
-		if (platform.myColider.isColide(ball.GetPosition()))
-		{
-			ball.SetPosition(prev);
-			// Plese make it not ChangeDirection but ChangeDirection. It is a common practice that vector and speed determince velocity
-			ball.ChangeDirection(platform.myColider.Colide(ball.GetPosition(), prev).xV, platform.myColider.Colide(ball.GetPosition(), prev).yV);
+		balls.push_back(ball);
+		if (Ball::ballCounter == 0) {
+			lose.Update();
+		}
+		else if (Map::counter == 32) {
+			win.Update();
+		}
+		else {
+			for (int i = 0; i < 1; i++) {
+				if (Map::counter % 10 == 0 && Map::counter!=0 && negBonus.onStage == false) {
+					negBonus.SetPosition(map.vectorOfFreePositions);
+					negBonus.onStage = true;
+				}
+				if (negBonus.onStage == true) {
+					negBonus.Update();
+					negBonus.CatchByPlatform(platform);
+				}
+				if (negBonus.isCatched == true) {
+					balls[i].SetPosition(negBonus.Effect(map.vectorOfFreePositions));
+					negBonus.isCatched = false;
+				}
+				std::cout << Map::counter << std::endl;
+				map.CreateMap();
+				platform.Update();
+				Point previousPosition = balls[i].GetPosition();
+				map.UpdateMap();
+
+				balls[i].Update();
+				map.BallInteractWithBrick(balls[i], previousPosition);
+				if (platform.myColider.isColide(balls[i].GetPosition()))
+				{
+					balls[i].SetPosition(previousPosition);
+					// Plese make it not ChangeDirection but ChangeDirection. It is a common practice that vector and speed determince velocity
+					balls[i].ChangeDirection(1, -1);
+				}
+			}
 		}
 		return false;
 	}
 
 	virtual void onMouseMove(int x, int y, int xrelative, int yrelative) {
-		if (ball.getIdle()) {
-			if (x >= 400) {
-				ball.SetVelocity(2, -2);
+			if (balls[0].getIdle()) {
+				if (x >= 400) {
+					balls[0].SetVelocity(3, -3);
+				}
+				else {
+					balls[0].SetVelocity(-3, -3);
+				}
+				balls[0].setIdle(false);
 			}
-			else {
-				ball.SetVelocity(-2, -2);
-			}
-			ball.setIdle(false);
-		}
 	}
 
 	virtual void onMouseButtonClick(FRMouseButton button, bool isReleased) {
-		if (button == FRMouseButton::LEFT && isReleased) {
-			ball.setIdle(isReleased);
-		}
+			if (button == FRMouseButton::LEFT && isReleased) {
+				balls[0].setIdle(isReleased);
+			}
 	}
 
 
@@ -311,8 +342,13 @@ public:
 		return "Arcanoid";
 	}
 private:
-	Platform platform = Platform(350, 550, 50, 100, 50);
+	Platform platform = Platform(350, 550, 70, 100, 20);
 	Ball ball = Ball(360, 530, 20, 20);
+	std::vector<Ball> balls;
+	Map map = Map();
+	Lose lose = Lose(0, 0, 800, 600);
+	Win win = Win(0, 0, 800, 600);
+	NegativeBonus negBonus = NegativeBonus(20, 20);
 };
 
 

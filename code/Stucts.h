@@ -9,11 +9,3 @@ struct Point {
 	double y;
 };
 
-struct NormalizeVector {
-	double xV;
-	double yV;
-	NormalizeVector(Point B, Point A, int l) {
-		xV = (B.x - A.x) / l;
-		yV = (B.y - A.y) / l;
-	}
-};

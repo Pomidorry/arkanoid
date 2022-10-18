@@ -6,7 +6,9 @@ Brick::Brick(int x, int y, int width, int height) : Object(width, height) {
 	o_path = tmp.string() + "\\data\\\\17-Breakout-Tiles.png";
 };
 void Brick::Update() {
-	SetPath();
-	DrawObject();
-	Destroy();
+	if (onStage == true) {
+		SetPath();
+		DrawObject();
+		Destroy();
+	}
 };

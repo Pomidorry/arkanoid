@@ -1,3 +1,4 @@
+#pragma once
 #include "Object.h"
 #include "Colder.h"
 #include <filesystem>
@@ -10,7 +11,7 @@ public:
 	void Collision();
 	void Destroy();
 	void Update();
-	Colider myColider = Colider(o_width, o_height, this); // You already have width, height. Use it here
+	Colider myColider = Colider( this); // You already have width, height. Use it here
 private:
 	int step;
 };

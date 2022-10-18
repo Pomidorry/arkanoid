@@ -4,10 +4,10 @@
 
 class Colider {
 public:
-	Colider(int w, int h, const Object* object);
+	Colider( const Object* object);
 	// Is colide should work not with point but with another colider
 	bool isColide(Point p);
-	NormalizeVector Colide(Point curr, Point prev);
+	/*Point Colide( Point prev);*/
 
 
 private:
